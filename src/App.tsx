@@ -1,24 +1,72 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+// App.tsx
+import React, { useState } from "react";
+import "./App.css";
+import Quiz from "./quiz";
+import Result from "./result";
+
+interface QuestionType {
+  text: string;
+  answers: string[];
+  correctAnswer: string;
+}
+
+const questions: QuestionType[] = [
+  {
+    text: "Which type of climbing involves a rope from above for safety?",
+    answers: [
+      "Bouldering",
+      "Top-rope climbing",
+      "Free soloing",
+      "Deep water soloing",
+    ],
+    correctAnswer: "Top-rope climbing",
+  },
+  {
+    text: "What is the name of the world famous climbing area in Yosemite National Park, USA?",
+    answers: ["El Capitan", "K2", "Everest", "Kilimanjaro"],
+    correctAnswer: "El Capitan",
+  },
+  // Add as many questions as you like
+];
 
 function App() {
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [score, setScore] = useState(0);
+  const [showScore, setShowScore] = useState(false);
+  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
+  const [isAnswered, setIsAnswered] = useState(false);
+
+  const handleAnswer = (selectedAnswer: string) => {
+    setSelectedAnswer(selectedAnswer);
+    setIsAnswered(true);
+
+    if (selectedAnswer === questions[currentQuestion].correctAnswer) {
+      setScore(score + 1);
+    }
+
+    setTimeout(() => {
+      const nextQuestion = currentQuestion + 1;
+      if (nextQuestion < questions.length) {
+        setCurrentQuestion(nextQuestion);
+        setIsAnswered(false);
+      } else {
+        setShowScore(true);
+      }
+    }, 1000); // Wait 1 second before going to the next question
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="App bg-gradient-to-r from-pink-200 via-blue-200 to-purple-200 min-h-screen flex items-center justify-center">
+      {showScore ? (
+        <Result score={score} total={questions.length} />
+      ) : (
+        <Quiz
+          questions={[questions[currentQuestion]]}
+          handleAnswer={handleAnswer}
+          selectedAnswer={selectedAnswer}
+          isAnswered={isAnswered}
+        />
+      )}
     </div>
   );
 }
